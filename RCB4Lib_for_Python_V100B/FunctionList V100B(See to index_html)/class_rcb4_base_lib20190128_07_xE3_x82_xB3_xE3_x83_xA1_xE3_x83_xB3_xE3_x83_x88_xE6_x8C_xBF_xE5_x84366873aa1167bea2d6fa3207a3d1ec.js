@@ -1,0 +1,12 @@
+var class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec =
+[
+    [ "AdcRamAddress", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec.html#ad4784a0b5de51b6bc16bd63d4b403d77", null ],
+    [ "ConfigRamAddress", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec.html#a0dd890594a9bcc04888a3c6cc724f00b", null ],
+    [ "CounterRamAddress", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec.html#ad77173dd63a225b00ee5f9a9ff3f1b05", null ],
+    [ "KrrButtonDataAddress", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec.html#a8d55f953f5db3eca1725280abeb8de97", null ],
+    [ "KrrPa1Address", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec.html#ae9db53e68f38e6a9a46d05123a36bb11", null ],
+    [ "PioAddress", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec.html#a547f776054cfc7dd7ef10a18cf184d68", null ],
+    [ "PioModeAddres", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec.html#afc502834180f18a2245fd7ed84ceae3e", null ],
+    [ "ProgramCounterRamAddress", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec.html#a88337a05cae57f5a312cc2f564b9394d", null ],
+    [ "UserParmeterRamAddress", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x84366873aa1167bea2d6fa3207a3d1ec.html#a2c28dca80b3125bcee004ca6fffccc14", null ]
+];

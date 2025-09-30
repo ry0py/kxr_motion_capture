@@ -1,0 +1,6 @@
+var class_rcb4_base_lib20190204_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x03865a94f0f201393fdd9042a07e596c =
+[
+    [ "MainLoopCmd", "class_rcb4_base_lib20190204_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x03865a94f0f201393fdd9042a07e596c.html#a623d4044350d3e0854e45b335492a55d", null ],
+    [ "MotionRomAddress", "class_rcb4_base_lib20190204_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x03865a94f0f201393fdd9042a07e596c.html#a878bd4bc33f63883b8babc5a16026ecc", null ],
+    [ "StartupCmdRomAddress", "class_rcb4_base_lib20190204_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x03865a94f0f201393fdd9042a07e596c.html#a2debce9064f92273e690d07414f80f15", null ]
+];

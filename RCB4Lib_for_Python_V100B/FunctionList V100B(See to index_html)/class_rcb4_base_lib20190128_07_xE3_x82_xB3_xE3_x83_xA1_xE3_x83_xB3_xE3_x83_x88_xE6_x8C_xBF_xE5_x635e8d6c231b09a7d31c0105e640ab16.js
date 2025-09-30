@@ -1,0 +1,5 @@
+var class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x635e8d6c231b09a7d31c0105e640ab16 =
+[
+    [ "Error", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x635e8d6c231b09a7d31c0105e640ab16.html#a0de084ce7ed6cdf9abe0ba7b0178b544", null ],
+    [ "Ok", "class_rcb4_base_lib20190128_07_xE3_x82_xB3_xE3_x83_xA1_xE3_x83_xB3_xE3_x83_x88_xE6_x8C_xBF_xE5_x635e8d6c231b09a7d31c0105e640ab16.html#abd000f7adeae794c8c18a1893ada15e7", null ]
+];

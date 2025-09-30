@@ -1,0 +1,13 @@
+<map id="Rcb4BaseLib.Rcb4BaseLib.motionPlay" name="Rcb4BaseLib.Rcb4BaseLib.motionPlay">
+<area shape="rect" id="node2" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#acdbc9d2d229eeffe95f03c4c8cba6279" title="モーションを一時停止させる " alt="" coords="303,5,536,32"/>
+<area shape="rect" id="node7" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#aacbd75985d768cb40085bf6de117f8cd" title="プログラムカウンタをリセットします " alt="" coords="313,57,526,98"/>
+<area shape="rect" id="node8" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#a58bb9a48bec63178ced3812945c557c7" title="モーションのアドレスにジャンプします " alt="" coords="318,174,521,215"/>
+<area shape="rect" id="node12" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#a5e0e14caba8ab94cbb22d518bcd6b618" title="モーションをリスタートさせます " alt="" coords="306,123,533,149"/>
+<area shape="rect" id="node3" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#aaec2039f249bf877bbe5df4b988f042c" title="COMからRAMにデータを転送します(COM ==&gt; RAM) " alt="" coords="615,57,830,98"/>
+<area shape="rect" id="node4" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#a50aabe0b4e9420269c4ee33fa997c521" title="COMからRAMに転送するコマンドを作成する(COM ==&gt; RAM) " alt="" coords="929,57,1144,98"/>
+<area shape="rect" id="node5" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#a3da44a8c437057c294cad5db5e67fc20" title="実際に送受信を行う " alt="" coords="909,181,1164,208"/>
+<area shape="rect" id="node6" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#a80cc10c648a6ea0781dedbd933d5a5df" title="取得したデータのチェックサムを確認する " alt="" coords="1212,174,1396,215"/>
+<area shape="rect" id="node9" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#a5d9b456754d51bfbc1702192f8109263" title="指定したROMのアドレスにコールするコマンドを作成する " alt="" coords="607,123,838,149"/>
+<area shape="rect" id="node10" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#a723d5baa01805b33476aeb515a2fbed9" title="モーション番号からROMに保存されている先頭アドレスを算出します " alt="" coords="611,174,834,215"/>
+<area shape="rect" id="node11" href="$class_rcb4_base_lib_1_1_rcb4_base_lib.html#adc6c6d016129f73a3e5e36b936921ea3" title="送受信後ＡＣＫ判定 " alt="" coords="584,240,861,267"/>
+</map>
