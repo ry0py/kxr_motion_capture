@@ -33,6 +33,8 @@ def move_servo_to_angle(rcb4, servo_id, sio, angle, frame_time=100):
 
 # メイン処理
 rcb4 = Rcb4BaseLib()
+id = 2
+sio =2
 
 # 接続
 print("RCB4に接続中...")
@@ -49,23 +51,23 @@ if rcb4.checkAcknowledge():
         print("\n=== サーボテスト開始 ===")
 
         # 0度（中央）
-        move_servo_to_angle(rcb4, servo_id=1, sio=1, angle=0, frame_time=150)
+        move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=0, frame_time=150)
         time.sleep(2)
 
         # 90度（右）
-        move_servo_to_angle(rcb4, servo_id=1, sio=1, angle=90, frame_time=150)
+        move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=10, frame_time=50)
         time.sleep(2)
 
-        # -90度（左）
-        move_servo_to_angle(rcb4, servo_id=1, sio=1, angle=-90, frame_time=150)
-        time.sleep(2)
+        # # -90度（左）
+        # move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=-90, frame_time=150)
+        # time.sleep(2)
 
         # 45度
-        move_servo_to_angle(rcb4, servo_id=1, sio=1, angle=45, frame_time=150)
+        move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=45, frame_time=150)
         time.sleep(2)
 
         # 0度に戻す
-        move_servo_to_angle(rcb4, servo_id=1, sio=1, angle=0, frame_time=150)
+        move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=0, frame_time=150)
         time.sleep(1)
 
         print("\n=== テスト完了 ===")
