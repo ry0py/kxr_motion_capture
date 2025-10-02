@@ -8,7 +8,6 @@ sys.path.append("./RCB4Lib_for_Python_V100B/Rcb4Lib")
 from Rcb4BaseLib import Rcb4BaseLib
 import time
 
-
 def angle_to_position(angle_degrees):
     """角度をRCB4ポジションに変換"""
     # -135度から+135度を3500から11500に変換
@@ -62,11 +61,25 @@ def main():
             command = json.loads(text)
             # print(f"    コマンド: {command.get('leftUpperArm', 0)}")
             print(f"    コマンド: {command}")
-            servo1_angle = command.get('rightUpperArm', 0)
+            left_shoulder_angle = command.get('leftShoulder', 0)
+            left_upper_arm_angle = command.get('leftUpperArm', 0)
+            left_lower_arm_angle = command.get('leftLowerArm', 0)
+            right_shoulder_angle = command.get('rightShoulder', 0)
+            right_upper_arm_angle = command.get('rightUpperArm', 0)
+            right_lower_arm_angle = command.get('rightLowerArm', 0)
+            
             if rcb4.checkAcknowledge():
-                move_servo_to_angle(rcb4, servo_id=1, sio=1, angle=servo1_angle-90, frame_time=100)
+                move_servo_to_angle(rcb4, servo_id=1, sio=1, angle=right_shoulder_angle, frame_time=50)
+                move_servo_to_angle(rcb4, servo_id=2, sio=1, angle=right_upper_arm_angle, frame_time=50)
+                move_servo_to_angle(rcb4, servo_id=3, sio=1, angle=right_lower_arm_angle, frame_time=50)
+
+                # move_servo_to_angle(rcb4, servo_id=1, sio=2, angle=left_shoulder_angle-90, frame_time=50)
+                # move_servo_to_angle(rcb4, servo_id=2, sio=2, angle=left_upper_arm_angle-90, frame_time=50)
+                # move_servo_to_angle(rcb4, servo_id=3, sio=2, angle=left_lower_arm_angle-90, frame_time=50)
+            else:
+                print("RCB4接続失敗!")
             print()
-            time.sleep(0.1)
+            time.sleep(0.56)
 
     except KeyboardInterrupt:
         print("\n受信停止")
