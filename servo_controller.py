@@ -11,6 +11,48 @@ from Rcb4BaseLib import Rcb4BaseLib
 import time
 import math
 
+from enum import Enum
+
+class UnityHHumanoidJson(Enum):
+    HIPS = "Hips"
+    SPINE = "Spine"
+    CHEST = "Chest"
+    UPPER_CHEST = "UpperChest"
+    NECK = "Neck"
+    HEAD = "Head"
+    LEFT_SHOULDER = "LeftShoulder"
+    LEFT_UPPER_ARM = "LeftUpperArm"
+    LEFT_LOWER_ARM = "LeftLowerArm"
+    LEFT_HAND = "LeftHand"
+    RIGHT_SHOULDER = "RightShoulder"
+    RIGHT_UPPER_ARM = "RightUpperArm"
+    RIGHT_LOWER_ARM = "RightLowerArm"
+    RIGHT_HAND = "RightHand"
+    LEFT_UPPER_LEG = "LeftUpperLeg"
+    LEFT_LOWER_LEG = "LeftLowerLeg"
+    LEFT_FOOT = "LeftFoot"
+    LEFT_TOE_BASE = "LeftToeBase"
+    RIGHT_UPPER_LEG = "RightUpperLeg"
+    RIGHT_LOWER_LEG = "RightLowerLeg"
+    RIGHT_FOOT = "RightFoot"
+    RIGHT_TOE_BASE = "RightToeBase"
+class ServoJson(Enum):
+    RIGHT_SHOULDER = "RightShoulder"
+    RIGHT_UPPER_ARM = "RightUpperArm"
+    RIGHT_LOWER_ARM = "RightLowerArm"
+    LEFT_SHOULDER = "LeftShoulder"
+    LEFT_UPPER_ARM = "LeftUpperArm"
+    LEFT_LOWER_ARM = "LeftLowerArm"
+    RIGHT_UPPER_LEG0 = "RightUpperLeg0"
+    RIGHT_UPPER_LEG1 = "RightUpperLeg1"
+    RIGHT_LOWER_LEG = "RightLowerLeg"
+    RIGHT_FOOT0 = "RightFoot0"
+    RIGHT_FOOT1 = "RightFoot1"
+    LEFT_UPPER_LEG0 = "LeftUpperLeg0"
+    LEFT_UPPER_LEG1 = "LeftUpperLeg1"
+    LEFT_LOWER_LEG = "LeftLowerLeg"
+    LEFT_FOOT0 = "LeftFoot0"
+    LEFT_FOOT1 = "LeftFoot1"
 
 class RcbServoController:
     def __init__(self, com_port="COM3"):
@@ -21,20 +63,20 @@ class RcbServoController:
             com_port (str): COMポート名 (例: 'COM1', 'COM3')
         """
         self.rcb4 = Rcb4BaseLib()
-        self.com_port = com_port
-        self.is_connected = False
+        self.connect(com_port)
+        self.move_t_pose(frame_time=100)
 
-    def connect(self):
+    def connect(self, com_port="COM1"):
         """RCB4に接続"""
         try:
-            result = self.rcb4.open(self.com_port, 115200, 1.3)
+            result = self.rcb4.open(com_port, 115200, 1.3)
             if result and self.rcb4.checkAcknowledge():
                 self.is_connected = True
-                print(f"RCB4に正常に接続しました (ポート: {self.com_port})")
+                print(f"RCB4に正常に接続しました (ポート: {com_port})")
                 print(f"バージョン: {self.rcb4.Version}")
                 return True
             else:
-                print(f"RCB4への接続に失敗しました (ポート: {self.com_port})")
+                print(f"RCB4への接続に失敗しました (ポート: {com_port})")
                 return False
         except Exception as e:
             print(f"接続エラー: {e}")
@@ -46,6 +88,47 @@ class RcbServoController:
             self.rcb4.close()
             self.is_connected = False
             print("RCB4から切断しました")
+    
+    def move_t_pose(self, frame_time=100):
+        """Tポーズに移動"""
+        if not self.is_connected:
+            print("RCB4が接続されていません")
+            return False
+
+        try:
+            # Tポーズのサーボ角度設定
+            all_servo_angles = [
+                (1, 1, 90),   # 右肩
+                (2, 1, 0),    # 右上腕
+                (3, 1, 0),    # 右前腕
+                (1, 2, -90),  # 左肩
+                (2, 1, 0),    # 左上腕
+                (3, 1, 0),    # 左前腕
+                (4, 1, 0),    # 右太もも0
+                (5, 1, 0),    # 右太もも1
+                (6, 1, 0),    # 右すね
+                (7, 1, 0),    # 右足首0
+                (8, 1, 0),    # 右足首1
+                (4, 2, 0),   # 左太もも0
+                (5, 2, 0),   # 左太もも1
+                (6, 2, 0),   # 左すね
+                (7, 2, 0),   # 左足首0
+                (8, 2, 0),   # 左足首1
+            ]
+            upper_body_angles = [
+                (1, 1, 0),   # 右肩
+                (2, 1, 90),    # 右上腕
+                (3, 1, 0),    # 右前腕
+                (1, 2, 0),  # 左肩
+                (2, 2, 90),    # 左上腕
+                (3, 2, 0),    # 左前腕
+            ]
+
+            return self.move_multiple_servos(upper_body_angles, frame_time=frame_time)
+
+        except Exception as e:
+            print(f"Tポーズ移動エラー: {e}")
+            return False
 
     def angle_to_position(self, angle_degrees):
         """
@@ -86,44 +169,18 @@ class RcbServoController:
 
         angle = ((position - center_position) / max_range) * 135.0
         return angle
+    
+    def apply_servo_command(self, command, frame_time=50):
+        """受信コマンドをRCB4へ反映"""
 
-    def move_servo(self, servo_id, sio, angle_degrees, frame_time=100):
-        """
-        サーボを指定角度に移動
+        right_shoulder_angle = command.get(ServoJson.RIGHT_SHOULDER.value, 0)
+        right_upper_arm_angle = command.get(ServoJson.RIGHT_UPPER_ARM.value, 0)
+        right_lower_arm_angle = command.get(ServoJson.RIGHT_LOWER_ARM.value, 0)
 
-        Args:
-            servo_id (int): サーボID (0-17)
-            sio (int): SIO番号 (1: SIO1-4, 2: SIO5-8)
-            angle_degrees (float): 目標角度（度）-135度から+135度
-            frame_time (int): 移動時間（フレーム数、1フレーム≒11.2ms）
+        self.move_servo_to_angle(servo_id=1, sio=1, angle=right_shoulder_angle, frame_time=frame_time)
+        self.move_servo_to_angle(servo_id=2, sio=1, angle=right_upper_arm_angle, frame_time=frame_time)
+        self.move_servo_to_angle(servo_id=3, sio=1, angle=right_lower_arm_angle, frame_time=frame_time)
 
-        Returns:
-            bool: 成功時True、失敗時False
-        """
-        if not self.is_connected:
-            print("RCB4が接続されていません")
-            return False
-
-        try:
-            # 角度をポジションデータに変換
-            position = self.angle_to_position(angle_degrees)
-
-            # ServoDataオブジェクトを作成
-            servo_data = self.rcb4.ServoData(servo_id, sio, position)
-
-            # サーボを移動
-            result = self.rcb4.setServoPos([servo_data], frame_time)
-
-            if result:
-                print(f"サーボ{servo_id} (SIO{sio}) を {angle_degrees:.1f}度 (ポジション{position}) に移動しました")
-                return True
-            else:
-                print(f"サーボ{servo_id} (SIO{sio}) の移動に失敗しました")
-                return False
-
-        except Exception as e:
-            print(f"サーボ移動エラー: {e}")
-            return False
 
     def move_multiple_servos(self, servo_angles, frame_time=100):
         """
@@ -152,6 +209,7 @@ class RcbServoController:
 
             # 複数サーボを同時移動
             result = self.rcb4.setServoPos(servo_data_list, frame_time)
+
 
             if result:
                 print(f"{len(servo_angles)}個のサーボを同時に移動しました")
@@ -184,58 +242,3 @@ class RcbServoController:
         except Exception as e:
             print(f"サーボフリー設定エラー: {e}")
             return False
-
-
-def main():
-    """使用例"""
-    # コントローラーを作成（COMポートを適切に設定してください）
-    controller = RcbServoController("COM3")  # 実際のCOMポートに変更
-
-    try:
-        # RCB4に接続
-        if not controller.connect():
-            print("接続に失敗しました。COMポートを確認してください。")
-            return
-
-        # 使用例1: 単一サーボを90度に移動
-        print("\n=== 単一サーボ制御例 ===")
-        controller.move_servo(servo_id=0, sio=1, angle_degrees=90, frame_time=200)
-        time.sleep(2)
-
-        # 使用例2: 単一サーボを-45度に移動
-        controller.move_servo(servo_id=0, sio=1, angle_degrees=-45, frame_time=150)
-        time.sleep(2)
-
-        # 使用例3: 複数サーボを同時移動
-        print("\n=== 複数サーボ制御例 ===")
-        servo_movements = [
-            (0, 1, 0),  # サーボID0, SIO1, 0度
-            (1, 1, 45),  # サーボID1, SIO1, 45度
-            (2, 1, -30),  # サーボID2, SIO1, -30度
-        ]
-        controller.move_multiple_servos(servo_movements, frame_time=180)
-        time.sleep(3)
-
-        # 使用例4: サーボを中央位置に戻す
-        print("\n=== 中央位置に戻す ===")
-        reset_movements = [
-            (0, 1, 0),  # 中央位置
-            (1, 1, 0),  # 中央位置
-            (2, 1, 0),  # 中央位置
-        ]
-        controller.move_multiple_servos(reset_movements, frame_time=200)
-        time.sleep(2)
-
-        # 使用例5: サーボをフリー状態にする
-        print("\n=== フリー状態設定 ===")
-        controller.set_servo_free(0, 1)
-
-    except KeyboardInterrupt:
-        print("\n操作が中断されました")
-    finally:
-        # 切断
-        controller.disconnect()
-
-
-if __name__ == "__main__":
-    main()
