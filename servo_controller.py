@@ -13,7 +13,7 @@ import math
 
 from enum import Enum
 
-class UnityHHumanoidJson(Enum):
+class UnityHumanoidJson(Enum):
     HIPS = "Hips"
     SPINE = "Spine"
     CHEST = "Chest"
@@ -172,15 +172,19 @@ class RcbServoController:
     
     def apply_servo_command(self, command, frame_time=50):
         """受信コマンドをRCB4へ反映"""
+        print("Applying command:", command)
+        right_shoulder_position = command.get(UnityHumanoidJson.RIGHT_SHOULDER.value, 0)
+        right_upper_arm_position = command.get(UnityHumanoidJson.RIGHT_UPPER_ARM.value, 0)
+        right_lower_arm_position = command.get(UnityHumanoidJson.RIGHT_LOWER_ARM.value, 0)
+        left_hand_position = command.get(UnityHumanoidJson.LEFT_HAND.value, 0)
 
-        right_shoulder_angle = command.get(ServoJson.RIGHT_SHOULDER.value, 0)
-        right_upper_arm_angle = command.get(ServoJson.RIGHT_UPPER_ARM.value, 0)
-        right_lower_arm_angle = command.get(ServoJson.RIGHT_LOWER_ARM.value, 0)
+        right_lower_angle = math.atan2(left_hand_position.get("y", 0), left_hand_position.get("x", 0)) * (180.0 / math.pi)
+        print("Right Lower Arm Angle:", right_lower_angle)
 
-        self.move_servo_to_angle(servo_id=1, sio=1, angle=right_shoulder_angle, frame_time=frame_time)
-        self.move_servo_to_angle(servo_id=2, sio=1, angle=right_upper_arm_angle, frame_time=frame_time)
-        self.move_servo_to_angle(servo_id=3, sio=1, angle=right_lower_arm_angle, frame_time=frame_time)
-
+        upper_body_angles = [
+            (3, 1, right_lower_angle),   # 右肩
+        ]
+        self.move_multiple_servos(upper_body_angles, frame_time=frame_time)
 
     def move_multiple_servos(self, servo_angles, frame_time=100):
         """
