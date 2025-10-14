@@ -10,6 +10,7 @@ sys.path.append("./RCB4Lib_for_Python_V100B/Rcb4Lib")  # Rcb4Libの検索パス�
 from Rcb4BaseLib import Rcb4BaseLib
 import time
 import math
+import numpy as np
 
 from enum import Enum
 
@@ -37,12 +38,13 @@ class UnityHumanoidJson(Enum):
     RIGHT_FOOT = "RightFoot"
     RIGHT_TOE_BASE = "RightToeBase"
 class ServoJson(Enum):
-    RIGHT_SHOULDER = "RightShoulder"
-    RIGHT_UPPER_ARM = "RightUpperArm"
-    RIGHT_LOWER_ARM = "RightLowerArm"
-    LEFT_SHOULDER = "LeftShoulder"
-    LEFT_UPPER_ARM = "LeftUpperArm"
-    LEFT_LOWER_ARM = "LeftLowerArm"
+    LEFT_SHOULDER_PITCH = "LeftShoulderPitch"
+    LEFT_SHOULDER_YAW = "LeftShoulderYaw"
+    LEFT_ELBOW = "LeftElbow"
+    RIGHT_SHOULDER_PITCH = "RightShoulderPitch"
+    RIGHT_SHOULDER_YAW = "RightShoulderYaw"
+    RIGHT_ELBOW = "RightElbow"
+
     RIGHT_UPPER_LEG0 = "RightUpperLeg0"
     RIGHT_UPPER_LEG1 = "RightUpperLeg1"
     RIGHT_LOWER_LEG = "RightLowerLeg"
@@ -172,19 +174,43 @@ class RcbServoController:
     
     def apply_servo_command(self, command, frame_time=50):
         """受信コマンドをRCB4へ反映"""
-        print("Applying command:", command)
-        right_shoulder_position = command.get(UnityHumanoidJson.RIGHT_SHOULDER.value, 0)
+        command = self.convert_command2np(command)
+        right_shoulder_position = command[UnityHumanoidJson.RIGHT_SHOULDER.value]
         right_upper_arm_position = command.get(UnityHumanoidJson.RIGHT_UPPER_ARM.value, 0)
         right_lower_arm_position = command.get(UnityHumanoidJson.RIGHT_LOWER_ARM.value, 0)
-        left_hand_position = command.get(UnityHumanoidJson.LEFT_HAND.value, 0)
-
-        right_lower_angle = math.atan2(left_hand_position.get("y", 0), left_hand_position.get("x", 0)) * (180.0 / math.pi)
-        print("Right Lower Arm Angle:", right_lower_angle)
-
+        right_hand_position = command.get(UnityHumanoidJson.RIGHT_HAND.value, 0)
+        rsp,rsy,re = self.calc_arm_angles(right_upper_arm_position, right_lower_arm_position, right_hand_position)
         upper_body_angles = [
-            (3, 1, right_lower_angle),   # 右肩
+            # (1, 1, rsp),   # 右肩ピッチ
+            # (1, 2, rsy),   # 右肩ヨー
+            (3, 1, -re),   # 右肘
         ]
+        print("ひじの角度は:", re)
         self.move_multiple_servos(upper_body_angles, frame_time=frame_time)
+
+    def convert_command2np(self, command):
+        """コマンドをnumpy配列に変換"""
+        joint_angles = {}
+        for joint in UnityHumanoidJson:
+            each_joint = command.get(joint.value, {"x": 0, "y": 0, "z": 0})
+            joint_angles[joint.value] = np.array([each_joint["x"], each_joint["y"], each_joint["z"]])
+        return joint_angles
+
+    def calc_arm_angles(self, upper_arm_pos, lower_arm_pos, hand_pos):
+        """腕の各関節の角度を計算"""
+        # ひじの角度を計算
+        s_to_h = hand_pos - upper_arm_pos
+        s_to_e = lower_arm_pos - upper_arm_pos
+        e_to_h = hand_pos - lower_arm_pos
+        l1 = np.linalg.norm(s_to_e, ord=2)  # 上腕の長さ
+        l2 = np.linalg.norm(e_to_h, ord=2)       # 前腕の長さ
+        d = np.linalg.norm(s_to_h, ord=2)        # 肘から手先までの距離
+        
+        shoulder_pitch_angle = math.atan2(s_to_h[1], s_to_h[0]) * (180.0 / math.pi)
+        shoulder_yaw_angle = math.atan2(s_to_h[2], s_to_h[0]) * (180.0 / math.pi)
+
+        elbow_angle = (math.pi - math.acos((l1**2 + l2**2 - d**2) / (2 * l1 * l2))) * (180.0 / math.pi)
+        return shoulder_pitch_angle, shoulder_yaw_angle, elbow_angle
 
     def move_multiple_servos(self, servo_angles, frame_time=100):
         """
