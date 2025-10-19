@@ -179,14 +179,35 @@ class RcbServoController:
         right_upper_arm_position = command[UnityHumanoidJson.RIGHT_UPPER_ARM.value]
         right_lower_arm_position = command[UnityHumanoidJson.RIGHT_LOWER_ARM.value]
         right_hand_position = command[UnityHumanoidJson.RIGHT_HAND.value]
+        left_shoulder_position = command[UnityHumanoidJson.LEFT_SHOULDER.value]
+        left_upper_arm_position = command[UnityHumanoidJson.LEFT_UPPER_ARM.value]
+        left_lower_arm_position = command[UnityHumanoidJson.LEFT_LOWER_ARM.value]
+        left_hand_position = command[UnityHumanoidJson.LEFT_HAND.value]
         
         rsp,rsy,re = self.calc_arm_angles(right_upper_arm_position, right_lower_arm_position, right_hand_position)
+        lsp,lsy,le = self.calc_arm_angles(left_upper_arm_position, left_lower_arm_position, left_hand_position)
+        print("肩ピッチの角度は:", rsp,"肩ヨーの角度は:", rsy,"肘の角度は:", re)
+        if(rsp > 90):
+            rsp = 90
+        if(rsp < -90):
+            rsp = -90
+        if(rsy > 90):
+            rsy = 90
+        if(rsy < -90):
+            rsy = -90
+        if(re > 90):
+            re = 90
+        if(re < -90):
+            re = -90
+
         upper_body_angles = [
-            # (1, 1, rsp),   # 右肩ピッチ
-            # (1, 2, rsy),   # 右肩ヨー
+            (1, 1, rsp),   # 右肩ピッチ
+            (2, 1, rsy + 90),   # 右肩ヨー
             (3, 1, -re),   # 右肘
+            (1, 2, lsp),   # 左肩ピッチ
+            (2, 2, lsy + 90),   # 左肩ヨー
+            (3, 2, -le),   # 左肘
         ]
-        print("ひじの角度は:", re)
         self.move_multiple_servos(upper_body_angles, frame_time=frame_time)
 
     def convert_command2np(self, command):
@@ -205,17 +226,14 @@ class RcbServoController:
         e_to_h = hand_pos - lower_arm_pos
         l1 = np.linalg.norm(s_to_e, ord=2)  # 上腕の長さ
         l2 = np.linalg.norm(e_to_h, ord=2)       # 前腕の長さ
-        d = np.linalg.norm(s_to_h, ord=2)        # 肘から手先までの距離
+        d = np.linalg.norm(s_to_h, ord=2)        # 肩から手先までの距離
 
         # 腕関節のピッチを計算(肩から肘をx,z平面に投影)
         shoulder_pitch_angle = math.atan2(s_to_e[2], s_to_e[0]) * (180.0 / math.pi)
 
-        # TODO 計算が異なるかも
-        # 腕関節のヨーを計算(肩から肘を肩関節のピッチ分x軸を回転させてからx-y平面での角度)
-        rotated_s_to_e_x = s_to_e[0] * math.cos(-shoulder_pitch_angle * (math.pi / 180.0)) - s_to_e[2] * math.sin(-shoulder_pitch_angle * (math.pi / 180.0))
-        rotated_s_to_e_y = s_to_e[1]
-
-        shoulder_yaw_angle = math.atan2(rotated_s_to_e_y, rotated_s_to_e_x) * (180.0 / math.pi)
+        # 腕関節のヨーを計算)
+        s_to_e_xz_len = math.sqrt(s_to_e[0]**2 + s_to_e[2]**2)
+        shoulder_yaw_angle = math.atan2(s_to_e[1], s_to_e_xz_len) * (180.0 / math.pi)
         # ひじの角度を計算(余弦定理)
         elbow_angle = (math.pi - math.acos((l1**2 + l2**2 - d**2) / (2 * l1 * l2))) * (180.0 / math.pi)
         return shoulder_pitch_angle, shoulder_yaw_angle, elbow_angle
