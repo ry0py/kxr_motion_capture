@@ -202,10 +202,10 @@ class RcbServoController:
 
         upper_body_angles = [
             (1, 1, rsp),   # 右肩ピッチ
-            (2, 1, rsy + 90),   # 右肩ヨー
+            (2, 1, -rsy),   # 右肩ヨー
             (3, 1, -re),   # 右肘
-            (1, 2, lsp),   # 左肩ピッチ
-            (2, 2, lsy + 90),   # 左肩ヨー
+            (1, 2, -lsp),   # 左肩ピッチ
+            (2, 2, lsy),   # 左肩ヨー
             (3, 2, -le),   # 左肘
         ]
         self.move_multiple_servos(upper_body_angles, frame_time=frame_time)
