@@ -118,12 +118,12 @@ class RcbServoController:
                 (8, 2, 0),   # 左足首1
             ]
             upper_body_angles = [
-                (1, 1, 0),   # 右肩
-                (2, 1, 90),    # 右上腕
-                (3, 1, 0),    # 右前腕
-                (1, 2, 0),  # 左肩
-                (2, 2, 90),    # 左上腕
-                (3, 2, 0),    # 左前腕
+                (1, 1, 0,-180,180),   # 右肩
+                (2, 1, 90,0,180),    # 右上腕
+                (3, 1, 0,-135,135),    # 右前腕
+                (1, 2, 0,-180,180),  # 左肩
+                (2, 2, 90,0,180),    # 左上腕
+                (3, 2, 0,-135,135),    # 左前腕
             ]
 
             return self.move_multiple_servos(upper_body_angles, frame_time=frame_time)
@@ -132,7 +132,7 @@ class RcbServoController:
             print(f"Tポーズ移動エラー: {e}")
             return False
 
-    def angle_to_position(self, angle_degrees):
+    def angle_to_position(self, angle_degrees,min_angle=-135,max_angle=135):
         """
         角度(度)をRCB4のポジションデータに変換
 
@@ -145,32 +145,13 @@ class RcbServoController:
         # RCB4のサーボは通常-135度から+135度の範囲
         # ポジションデータは3500(最小)から11500(最大)
 
-        # 角度を-135度から+135度の範囲に制限
-        angle_degrees = max(-135, min(135, angle_degrees))
+        # 角度をmin_angle度からmax_angle度の範囲に制限
+        angle_degrees = max(min_angle, min(max_angle, angle_degrees))
 
         # 角度をポジションデータに変換
-        # -135度 → 3500, 0度 → 7500, +135度 → 11500
-        center_position = 7500  # 中央位置
-        max_range = 4000  # 中央から最大/最小までの範囲
 
-        position = center_position + (angle_degrees / 135.0) * max_range
+        position = (11500 - 3500) / (135 + 135) * (angle_degrees) + 7500
         return int(position)
-
-    def position_to_angle(self, position):
-        """
-        RCB4のポジションデータを角度(度)に変換
-
-        Args:
-            position (int): RCB4ポジションデータ (3500-11500)
-
-        Returns:
-            float: 角度（度）
-        """
-        center_position = 7500
-        max_range = 4000
-
-        angle = ((position - center_position) / max_range) * 135.0
-        return angle
     
     def apply_servo_command(self, command, frame_time=50):
         """受信コマンドをRCB4へ反映"""
@@ -186,27 +167,16 @@ class RcbServoController:
         
         rsp,rsy,re = self.calc_arm_angles(right_upper_arm_position, right_lower_arm_position, right_hand_position)
         lsp,lsy,le = self.calc_arm_angles(left_upper_arm_position, left_lower_arm_position, left_hand_position)
-        print("肩ピッチの角度は:", rsp,"肩ヨーの角度は:", rsy,"肘の角度は:", re)
-        if(rsp > 90):
-            rsp = 90
-        if(rsp < -90):
-            rsp = -90
-        if(rsy > 90):
-            rsy = 90
-        if(rsy < -90):
-            rsy = -90
-        if(re > 90):
-            re = 90
-        if(re < -90):
-            re = -90
+        print("右肩ピッチの角度は:", rsp,"右肩ヨーの角度は:", rsy,"右肘の角度は:", re)
+        print("左肩ピッチの角度は:", lsp,"左肩ヨーの角度は:", lsy,"左肘の角度は:", le)
 
         upper_body_angles = [
-            (1, 1, rsp),   # 右肩ピッチ
-            (2, 1, -rsy),   # 右肩ヨー
-            (3, 1, -re),   # 右肘
-            (1, 2, -lsp),   # 左肩ピッチ
-            (2, 2, lsy),   # 左肩ヨー
-            (3, 2, -le),   # 左肘
+            (1, 1, -rsp-90,-180,180),   # 右肩ピッチ
+            (2, 1, -rsy ,0,180),   # 右肩ヨー
+            (3, 1, -re,-135,135),   # 右肘
+            (1, 2, lsp+90,-180,180),   # 左肩ピッチ
+            (2, 2, lsy,0,180),   # 左肩ヨー
+            (3, 2, -le,-135,135),   # 左肘
         ]
         self.move_multiple_servos(upper_body_angles, frame_time=frame_time)
 
@@ -243,7 +213,7 @@ class RcbServoController:
         複数のサーボを同時に移動
 
         Args:
-            servo_angles (list): [(servo_id, sio, angle), ...] のリスト
+            servo_angles (list): [(servo_id, sio, angle, min_angle, max_angle), ...] のリスト
             frame_time (int): 移動時間（フレーム数）
 
         Returns:
@@ -257,8 +227,8 @@ class RcbServoController:
             servo_data_list = []
 
             # 各サーボのデータを準備
-            for servo_id, sio, angle_degrees in servo_angles:
-                position = self.angle_to_position(angle_degrees)
+            for servo_id, sio, angle_degrees, min_angle, max_angle in servo_angles:
+                position = self.angle_to_position(angle_degrees, min_angle, max_angle)
                 servo_data = self.rcb4.ServoData(servo_id, sio, position)
                 servo_data_list.append(servo_data)
                 print(f"サーボ{servo_id} (SIO{sio}): {angle_degrees:.1f}度 → ポジション{position}")

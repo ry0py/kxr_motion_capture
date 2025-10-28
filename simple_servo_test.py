@@ -13,8 +13,9 @@ import time
 def angle_to_position(angle_degrees):
     """角度をRCB4ポジションに変換"""
     # -135度から+135度を3500から11500に変換
-    angle_degrees = max(-135, min(135, angle_degrees))
-    position = 7500 + (angle_degrees / 135.0) * 4000
+    # angle_degrees = max(-180, min(180, angle_degrees))
+    # position = 7500 + (angle_degrees / 180.0) * 4000
+    position = (12900 - 3500) / (180 + 135) * (angle_degrees) + 7500
     return int(position)
 
 
@@ -51,24 +52,26 @@ if rcb4.checkAcknowledge():
         print("\n=== サーボテスト開始 ===")
 
         # 0度（中央）
-        move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=0, frame_time=150)
+        move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=90, frame_time=150)
+        # servo_data = rcb4.ServoData(id, sio, 12900)
+        # result = rcb4.setServoPos([servo_data], 150)
         time.sleep(2)
 
-        # 90度（右）
-        move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=10, frame_time=50)
-        time.sleep(2)
-
-        # # -90度（左）
-        # move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=-90, frame_time=150)
+        # # 90度（右）
+        # move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=10, frame_time=50)
         # time.sleep(2)
 
-        # 45度
-        move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=45, frame_time=150)
-        time.sleep(2)
+        # # # -90度（左）
+        # # move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=-90, frame_time=150)
+        # # time.sleep(2)
 
-        # 0度に戻す
-        move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=0, frame_time=150)
-        time.sleep(1)
+        # # 45度
+        # move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=45, frame_time=150)
+        # time.sleep(2)
+
+        # # 0度に戻す
+        # move_servo_to_angle(rcb4, servo_id=id, sio=sio, angle=0, frame_time=150)
+        # time.sleep(1)
 
         print("\n=== テスト完了 ===")
 

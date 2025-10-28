@@ -71,7 +71,7 @@ def main():
     
     # RCB4接続
     com = "COM3"  # 実際のCOMポートに変更
-    frame_time = 150  # サーボ移動時間（フレーム数）
+    frame_time = 50  # サーボ移動時間（フレーム数）
     servo_controller = RcbServoController(com)  # 実際のCOMポートに変更
 
     command_queue = queue.Queue(maxsize=5)
