@@ -45,7 +45,7 @@ def udp_listener(sock, command_queue, stop_event):
                 pass
 
 
-def servo_worker(servo_controller,command_queue, stop_event, frame_time=50):
+def servo_worker(servo_controller,command_queue, stop_event, frame_time=50, is_motion_play=True):
     """キューからコマンドを取得してサーボへ反映"""
 
     while not stop_event.is_set():
@@ -54,7 +54,7 @@ def servo_worker(servo_controller,command_queue, stop_event, frame_time=50):
         except queue.Empty:
             continue
         try:
-            servo_controller.apply_servo_command(command, frame_time=frame_time)
+            servo_controller.apply_servo_command(command, frame_time=frame_time,is_motion_play=True)
         finally:
             command_queue.task_done()
 
@@ -70,8 +70,9 @@ def main():
     print("Ctrl+Cで停止")
     
     # RCB4接続
-    com = "COM3"  # 実際のCOMポートに変更
+    com = "COM4"  # 実際のCOMポートに変更
     frame_time = 50  # サーボ移動時間（フレーム数）
+    is_motion_play = True  # 歩行モーションを使用するか
     servo_controller = RcbServoController(com)  # 実際のCOMポートに変更
 
     command_queue = queue.Queue(maxsize=5)
@@ -85,7 +86,7 @@ def main():
     )
     worker_thread = threading.Thread(
         target=servo_worker,
-        args=(servo_controller, command_queue, stop_event, frame_time),
+        args=(servo_controller, command_queue, stop_event, frame_time,is_motion_play),
         name="ServoWorker",
         daemon=True,
     )

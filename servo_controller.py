@@ -153,7 +153,7 @@ class RcbServoController:
         position = (11500 - 3500) / (135 + 135) * (angle_degrees) + 7500
         return int(position)
     
-    def apply_servo_command(self, command, frame_time=50):
+    def apply_servo_command(self, command, frame_time=50, is_motion_play=True):
         """受信コマンドをRCB4へ反映"""
         command = self.convert_command2np(command)
         right_shoulder_position = command[UnityHumanoidJson.RIGHT_SHOULDER.value]
@@ -167,8 +167,8 @@ class RcbServoController:
         
         rsp,rsy,re = self.calc_arm_angles(right_upper_arm_position, right_lower_arm_position, right_hand_position)
         lsp,lsy,le = self.calc_arm_angles(left_upper_arm_position, left_lower_arm_position, left_hand_position)
-        print("右肩ピッチの角度は:", rsp,"右肩ヨーの角度は:", rsy,"右肘の角度は:", re)
-        print("左肩ピッチの角度は:", lsp,"左肩ヨーの角度は:", lsy,"左肘の角度は:", le)
+        # print("右肩ピッチの角度は:", rsp,"右肩ヨーの角度は:", rsy,"右肘の角度は:", re)
+        # print("左肩ピッチの角度は:", lsp,"左肩ヨーの角度は:", lsy,"左肘の角度は:", le)
 
         upper_body_angles = [
             (1, 1, -rsp-90,-180,180),   # 右肩ピッチ
@@ -179,6 +179,75 @@ class RcbServoController:
             (3, 2, -le,-135,135),   # 左肘
         ]
         self.move_multiple_servos(upper_body_angles, frame_time=frame_time)
+
+        # 別で腰らへんの位置とつま先の距離で後進か前進か横移動のモーションを実行する
+        right_upper_leg = command[UnityHumanoidJson.RIGHT_UPPER_LEG.value]
+        right_foot = command[UnityHumanoidJson.RIGHT_FOOT.value]
+        left_upper_leg = command[UnityHumanoidJson.LEFT_UPPER_LEG.value]
+        left_foot = command[UnityHumanoidJson.LEFT_FOOT.value]
+
+        if is_motion_play:
+            self.walk_motion(right_upper_leg, right_foot, left_upper_leg, left_foot)
+
+    def walk_motion(self, right_upper_leg, right_foot, left_upper_leg, left_foot):
+        dif_right_x = right_upper_leg[0] - right_foot[0]
+        dif_right_y = right_upper_leg[1] - right_foot[1]
+        dif_left_x = left_upper_leg[0] - left_foot[0]
+        dif_left_y = left_upper_leg[1] - left_foot[1]
+
+        if(dif_right_x < -0.3 or dif_left_x < -0.3):
+            print("前進")
+            self.rcb4.motionPlay(5)  # モーション番号1を再生
+            while True:  # モーションの再生が終わるまで繰り返し
+                motionNum = self.rcb4.getMotionPlayNum()  # 現在再生されているモーション番号を取得
+                if motionNum < 0:  # モーション番号が0より小さい場合はエラー
+                    print("motion get error", motionNum)
+                    break
+                if motionNum == 0:  # モーション番号が0のときは再生されていない状態
+                    print("stop motion or idle")
+                    break
+                print("play motion -> ", motionNum)
+                time.sleep(0.1)
+
+        if(dif_right_x > 0.2 or dif_left_x > 0.2):
+            print("後進")
+            self.rcb4.motionPlay(6)
+            while True:  # モーションの再生が終わるまで繰り返し
+                motionNum = self.rcb4.getMotionPlayNum()  # 現在再生されているモーション番号を取得
+                if motionNum < 0:  # モーション番号が0より小さい場合はエラー
+                    print("motion get error", motionNum)
+                    break
+                if motionNum == 0:  # モーション番号が0のときは再生されていない状態
+                    print("stop motion or idle")
+                    break
+                print("play motion -> ", motionNum)
+                time.sleep(0.1)
+        if(dif_right_y > 0.3 or dif_left_y > 0.3):
+            print("右に移動")
+            self.rcb4.motionPlay(8)
+            while True:  # モーションの再生が終わるまで繰り返し
+                motionNum = self.rcb4.getMotionPlayNum()  # 現在再生されているモーション番号を取得
+                if motionNum < 0:  # モーション番号が0より小さい場合はエラー
+                    print("motion get error", motionNum)
+                    break
+                if motionNum == 0:  # モーション番号が0のときは再生されていない状態
+                    print("stop motion or idle")
+                    break
+                print("play motion -> ", motionNum)
+                time.sleep(0.1)
+        if(dif_right_y < -0.3 or dif_left_y < -0.3):
+            print("左に移動")
+            self.rcb4.motionPlay(7)
+            while True:  # モーションの再生が終わるまで繰り返し
+                motionNum = self.rcb4.getMotionPlayNum()  # 現在再生されているモーション番号を取得
+                if motionNum < 0:  # モーション番号が0より小さい場合はエラー
+                    print("motion get error", motionNum)
+                    break
+                if motionNum == 0:  # モーション番号が0のときは再生されていない状態
+                    print("stop motion or idle")
+                    break
+                print("play motion -> ", motionNum)
+                time.sleep(0.1)
 
     def convert_command2np(self, command):
         """コマンドをnumpy配列に変換"""
@@ -231,14 +300,13 @@ class RcbServoController:
                 position = self.angle_to_position(angle_degrees, min_angle, max_angle)
                 servo_data = self.rcb4.ServoData(servo_id, sio, position)
                 servo_data_list.append(servo_data)
-                print(f"サーボ{servo_id} (SIO{sio}): {angle_degrees:.1f}度 → ポジション{position}")
+                # print(f"サーボ{servo_id} (SIO{sio}): {angle_degrees:.1f}度 → ポジション{position}")
 
             # 複数サーボを同時移動
             result = self.rcb4.setServoPos(servo_data_list, frame_time)
 
 
             if result:
-                print(f"{len(servo_angles)}個のサーボを同時に移動しました")
                 return True
             else:
                 print("複数サーボの移動に失敗しました")
